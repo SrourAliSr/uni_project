@@ -18,6 +18,14 @@ public class ContactItem {
         this.contactName = contactName;
         this.contactNumber = ContactNumber;
     }
+    public String getContactName() {
+        return contactName;
+    }
+
+    public int getContactNumber() {
+        return contactNumber;
+    }
+
 
     public Map<String, Object> getContact(){
        Map<String,Object> contact = new HashMap<>();

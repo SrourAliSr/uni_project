@@ -1,17 +1,17 @@
 package com.example.uniproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 public class contactListAdapter extends ArrayAdapter<ContactItem> {
     private Context context;
@@ -23,21 +23,35 @@ public class contactListAdapter extends ArrayAdapter<ContactItem> {
     }
 
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.list_item_layout, parent, false);
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(R.layout.list_item_layout, parent, false);
         }
-        ContactItem contact = contactItems.get(position);
 
         TextView contactName = convertView.findViewById(R.id.contactName);
-        TextView phoneNumber = convertView.findViewById(R.id.contactNumber);  // Fix this line
+        TextView contactNumber = convertView.findViewById(R.id.contactNumber);
+        ImageButton deleteButton = convertView.findViewById(R.id.deleteButton);
 
-        Map<String, Object> contactInfo = contact.getContact();
+        ContactItem contact = contactItems.get(position);
+        contactName.setText(contact.getContactName());
+        contactNumber.setText(String.valueOf(contact.getContactNumber()));
 
-        contactName.setText((String) contactInfo.get("contact name"));
-        phoneNumber.setText(String.valueOf(contactInfo.get("contact number")));
+        convertView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, Chat.class);
+            intent.putExtra("contactName", contact.getContactName());
+            context.startActivity(intent);
+        });
 
-        return convertView;  // Fix the return statement, use convertView instead of super.getView()
+        deleteButton.setOnClickListener(v -> {
+            ContactDatabaseHelper dbHelper = new ContactDatabaseHelper(context);
+            dbHelper.deleteContact(contact.getContactNumber());
+
+            contactItems.remove(position);
+            notifyDataSetChanged();
+        });
+
+        return convertView;
     }
 
 }
